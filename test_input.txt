@@ -1,0 +1,9 @@
+
+doi1|~|Body mass index in early adulthood and colorectal cancer risk for carriers and non-carriers of germline mutations in DNA mismatch repair genes. 
+doi2|~|Sexual harassment victimization in adolescence: Associations with family background
+doi3|~|Relationships between sexual violence and chronic disease: a cross-sectional study
+doi4|~|Measuring and explaining political sophistication through textual complexity
+
+
+
+
