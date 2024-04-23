@@ -4,10 +4,12 @@ FastAPI for the SDG classifier. This docstring will be updated.
 
 """
 
+import os
 import logging
 import traceback, argparse
 import uvicorn
 from collections import Counter
+import importlib.resources
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -27,19 +29,43 @@ setup_root_logger()
 LOGGER = logging.getLogger(__name__)
 LOGGER.info("SDG API initialized")
 
+BASE_PATH = importlib.resources.files(__package__.split(".")[0])
+
 ################################################################################################################
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--host",                   type=str,   default="0.0.0.0",      help="Host for flask api.",     required=False)
-parser.add_argument("--port",                   type=int,   default=29929,          help="Port for flask api.",     required=False)
-parser.add_argument("--log_path",               type=str,   default='sdg_api_models.log',  help="The path for the log file.", required=False)
-parser.add_argument("--guided_thres",           type=float, default=0.4,            help="",                        required=False)
-parser.add_argument("--BERT_thres",             type=float, default=0.7,            help="",                        required=False)
-parser.add_argument("--BERT_thres_old",         type=float, default=0.95,           help="",                        required=False)
-parser.add_argument("--BERT_ATT_thres_old",     type=float, default=0.98,           help="",                        required=False)
-parser.add_argument("--BERTOPIC_score_thres",   type=float, default=0.14,           help="",                        required=False)
-parser.add_argument("--BERTOPIC_count_thres",   type=int,   default=1,              help="",                        required=False)
-args                = parser.parse_args()
+# parser = argparse.ArgumentParser()
+# parser.add_argument("--host",                   type=str,   default="0.0.0.0",      help="Host for flask api.",     required=False)
+# parser.add_argument("--port",                   type=int,   default=29929,          help="Port for flask api.",     required=False)
+# parser.add_argument("--log_path",               type=str,   default='sdg_api_models.log',  help="The path for the log file.", required=False)
+# parser.add_argument("--guided_thres",           type=float, default=0.4,            help="",                        required=False)
+# parser.add_argument("--BERT_thres",             type=float, default=0.7,            help="",                        required=False)
+# parser.add_argument("--BERT_thres_old",         type=float, default=0.95,           help="",                        required=False)
+# parser.add_argument("--BERT_ATT_thres_old",     type=float, default=0.98,           help="",                        required=False)
+# parser.add_argument("--BERTOPIC_score_thres",   type=float, default=0.14,           help="",                        required=False)
+# parser.add_argument("--BERTOPIC_count_thres",   type=int,   default=1,              help="",                        required=False)
+# args                = parser.parse_args()
+
+################################################################################################################
+
+# guided_thres            = args.guided_thres         #0.4
+# BERT_thres              = args.BERT_thres           #0.7
+# BERT_thres_old          = args.BERT_thres_old       #0.95
+# BERT_ATT_thres_old      = args.BERT_ATT_thres_old   # 0.98
+# BERTOPIC_score_thres    = args.BERTOPIC_score_thres
+# BERTOPIC_count_thres    = args.BERTOPIC_count_thres
+
+################################################################################################################
+
+# NOTE: Because we used uvicorn it doesn't accept any other parameters than host and port, so they have to be passed as environment variables
+host = os.getenv("HOST", "0.0.0.0")
+port = int(os.getenv("PORT", 8000))
+log_path = os.getenv("LOG_PATH", "sdg_api_models.log")
+guided_thres = float(os.getenv("GUIDED_THRES", "0.4"))
+BERT_thres = float(os.getenv("BERT_THRES", "0.7"))
+BERT_thres_old = float(os.getenv("BERT_THRES_OLD", "0.95"))
+BERT_ATT_thres_old = float(os.getenv("BERT_ATT_THRES_OLD", "0.98"))
+BERTOPIC_score_thres = float(os.getenv("BERTOPIC_SCORE_THRES", "0.14"))
+BERTOPIC_count_thres = int(os.getenv("BERTOPIC_COUNT_THRES", "1"))
 
 ################################################################################################################
 
@@ -84,49 +110,38 @@ class ErrorResponse(BaseModel):
 # the FastAPI app
 app = FastAPI()
 
-################################################################################################################
-
-guided_thres            = args.guided_thres         #0.4
-BERT_thres              = args.BERT_thres           #0.7
-BERT_thres_old          = args.BERT_thres_old       #0.95
-BERT_ATT_thres_old      = args.BERT_ATT_thres_old   # 0.98
-BERTOPIC_score_thres    = args.BERTOPIC_score_thres
-BERTOPIC_count_thres    = args.BERTOPIC_count_thres
-
-################################################################################################################
-
 global k1_1, k1_2, k1_3, kt_match, glda, k4, bertopic
 
 def load_models():
     print(40 * '=')
     print('LOADING bert models')
-    k1_1 = K1_model(model_name="distilbert-base-uncased", hidden=100, resume_from='./model_checkpoints/distilbert-base-uncased_100_5e-05_29_84_85.pth.tar')
-    k1_2 = K1_model(model_name="distilbert-base-uncased", hidden=50, resume_from='./model_checkpoints/distilbert-base-uncased_50_5e-05_23_83_84.pth.tar')
-    k1_3 = K1_model(model_name="bert-base-uncased", hidden=100, resume_from='./model_checkpoints/bert-base-uncased_100_5e-05_16_84_84.pth.tar')
+    k1_1 = K1_model(model_name="distilbert-base-uncased", hidden=100, resume_from=BASE_PATH.joinpath('model_checkpoints/distilbert-base-uncased_100_5e-05_29_84_85.pth.tar'))
+    k1_2 = K1_model(model_name="distilbert-base-uncased", hidden=50, resume_from=BASE_PATH.joinpath('model_checkpoints/distilbert-base-uncased_50_5e-05_23_83_84.pth.tar'))
+    k1_3 = K1_model(model_name="bert-base-uncased", hidden=100, resume_from=BASE_PATH.joinpath('model_checkpoints/bert-base-uncased_100_5e-05_16_84_84.pth.tar'))
 
     print(40 * '=')
     print('LOADING KT MATCHING')
-    kt_match    = KT_matcher(kt_fpath = './data/sdg_vocabulary.xlsx')
+    kt_match    = KT_matcher(kt_fpath = BASE_PATH.joinpath('data/sdg_vocabulary.xlsx'))
 
     print(40 * '=')
     print('LOADING GUIDED LDA')
     glda        = MyGuidedLDA(
-        kt_fpath            = './data/sdg_vocabulary.xlsx',
-        guided_tm_path      = './model_checkpoints/guidedlda_model.pickle',
-        guided_tm_cv_path   = './model_checkpoints/guidedlda_countVectorizer.pickle'
+        kt_fpath            = BASE_PATH.joinpath('data/sdg_vocabulary.xlsx'),
+        guided_tm_path      = BASE_PATH.joinpath('model_checkpoints/guidedlda_model.pickle'),
+        guided_tm_cv_path   = BASE_PATH.joinpath('model_checkpoints/guidedlda_countVectorizer.pickle')
     )
 
     print(40 * '=')
     print('LOADING More bert models')
     k4 = K4_model(
         model_name      = "distilbert-base-uncased",
-        resume_from_1   = './model_checkpoints/distilbert-base-uncased_3_87_88.pth.tar',
-        resume_from_2   = './model_checkpoints/distilbert-base-uncased_4_78_80.pth.tar'
+        resume_from_1   = BASE_PATH.joinpath('model_checkpoints/distilbert-base-uncased_3_87_88.pth.tar'),
+        resume_from_2   = BASE_PATH.joinpath('model_checkpoints/distilbert-base-uncased_4_78_80.pth.tar')
     )
 
     print(40 * '=')
     print('LOADING Bertopic')
-    bertopic = MyBertTopic(bert_topic_path = './model_checkpoints/bert_topic_model_sdgs_no_num_of_topics')
+    bertopic = MyBertTopic(bert_topic_path = BASE_PATH.joinpath('model_checkpoints/bert_topic_model_sdgs_no_num_of_topics'))
 
     print(40 * '=')
     print('DONE LOADING. GO USE IT!')
@@ -215,11 +230,12 @@ def sdg_classifier(request: ClassifierRequest):
                 'success': 0,
                 'message': 'request should be json formated'
             }
+            ret = ErrorResponse(**ret)
             app.logger.debug(ret)
         return ret
     except Exception as e:
         LOGGER.error(f"Error: {e}")
-        raise HTTPException(status_code=400, detail={"success": 0, "message": f"{str(e)}\n{traceback.format_exc()}"})
+        return HTTPException(status_code=400, detail={"success": 0, "message": f"{str(e)}\n{traceback.format_exc()}"})
     
 
 # endpoint for reloading vocabulary
@@ -237,7 +253,7 @@ def reload_vocabulary():
         return ret
     except Exception as e:
         LOGGER.error(f"Error: {e}")
-        raise HTTPException(status_code=500, detail={"success": 0, "message": f"{str(e)}\n{traceback.format_exc()}"})
+        return HTTPException(status_code=500, detail={"success": 0, "message": f"{str(e)}\n{traceback.format_exc()}"})
     
 if __name__ == "__main__":
-    uvicorn.run(app, host=args.host, port=args.port)
+    uvicorn.run(app, host=host, port=port)

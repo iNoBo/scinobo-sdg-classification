@@ -36,6 +36,16 @@ COPY . /app
 # Change working directory
 WORKDIR /app/src
 
+# Envs for uvicorn api
+ENV HOST="0.0.0.0"
+ENV LOG_PATH="sdg_api_models.log"
+ENV GUIDED_THRES="0.4"
+ENV BERT_THRES="0.7"
+ENV BERT_THRES_OLD="0.95"
+ENV BERT_ATT_THRES_OLD="0.98"
+ENV BERTOPIC_SCORE_THRES="0.14"
+ENV BERTOPIC_COUNT_THRES="1"
+
 # Run a shell
 CMD ["bash"]
 

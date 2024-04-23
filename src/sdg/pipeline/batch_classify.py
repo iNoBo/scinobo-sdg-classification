@@ -9,11 +9,14 @@ from sdg.pipeline.box_4 import K4_model
 from sdg.pipeline.box_5 import MyBertTopic
 from tqdm import tqdm
 from collections import Counter
+import importlib.resources
 
 ################################################################################################################
 
 import logging
 logging.basicConfig(filename='sdg_api.log', level=logging.INFO, format="%(asctime)s;%(levelname)s;%(message)s")
+
+BASE_PATH = importlib.resources.files(__package__.split(".")[0])
 
 ################################################################################################################
 
@@ -51,35 +54,35 @@ ensemble_agreement      = args.ensemble_agreement
 
 print(40 * '=')
 print('LOADING bert models')
-k1_1 = K1_model(model_name="distilbert-base-uncased", hidden=100,   resume_from='./models/distilbert-base-uncased_100_5e-05_29_84_85.pth.tar')
-k1_2 = K1_model(model_name="distilbert-base-uncased", hidden=50,    resume_from='./models/distilbert-base-uncased_50_5e-05_23_83_84.pth.tar')
-k1_3 = K1_model(model_name="bert-base-uncased", hidden=100,         resume_from='./models/bert-base-uncased_100_5e-05_16_84_84.pth.tar')
+k1_1 = K1_model(model_name="distilbert-base-uncased", hidden=100,   resume_from=BASE_PATH.joinpath('model_checkpoints/distilbert-base-uncased_100_5e-05_29_84_85.pth.tar'))
+k1_2 = K1_model(model_name="distilbert-base-uncased", hidden=50,    resume_from=BASE_PATH.joinpath('model_checkpoints/distilbert-base-uncased_50_5e-05_23_83_84.pth.tar'))
+k1_3 = K1_model(model_name="bert-base-uncased", hidden=100,         resume_from=BASE_PATH.joinpath('model_checkpoints/bert-base-uncased_100_5e-05_16_84_84.pth.tar'))
 
 print(40 * '=')
 print('LOADING KT MATCHING')
-kt_match    = KT_matcher(kt_fpath = './models/sdg_vocabulary.xlsx')
+kt_match    = KT_matcher(kt_fpath = BASE_PATH.joinpath('model_checkpoints/sdg_vocabulary.xlsx'))
 
 print(40 * '=')
 print('LOADING GUIDED LDA')
 glda        = MyGuidedLDA(
-    kt_fpath            = './models/sdg_vocabulary.xlsx',
-    guided_tm_path      = './models/guidedlda_model.pickle',
-    guided_tm_cv_path   = './models/guidedlda_countVectorizer.pickle'
+    kt_fpath            = BASE_PATH.joinpath('model_checkpoints/sdg_vocabulary.xlsx'),
+    guided_tm_path      = BASE_PATH.joinpath('model_checkpoints/guidedlda_model.pickle'),
+    guided_tm_cv_path   = BASE_PATH.joinpath('model_checkpoints/guidedlda_countVectorizer.pickle')
 )
 print(40 * '=')
 print('LOADING More bert models')
 k4 = K4_model(
     model_name      = "distilbert-base-uncased",
-    resume_from_1   = './models/distilbert-base-uncased_3_87_88.pth.tar',
-    resume_from_2   = './models/distilbert-base-uncased_4_78_80.pth.tar'
+    resume_from_1   = BASE_PATH.joinpath('model_checkpoints/distilbert-base-uncased_3_87_88.pth.tar'),
+    resume_from_2   = BASE_PATH.joinpath('model_checkpoints/distilbert-base-uncased_4_78_80.pth.tar')
 )
 
 print(40 * '=')
 print('LOADING Bertopic')
 if torch.cuda.is_available():
-    bertopic = MyBertTopic(bert_topic_path = './models/bert_topic_model_sdgs_no_num_of_topics')
+    bertopic = MyBertTopic(bert_topic_path = BASE_PATH.joinpath('model_checkpoints/bert_topic_model_sdgs_no_num_of_topics'))
 else:
-    bertopic = MyBertTopic(bert_topic_path='./models/bert_topic_model_sdgs_no_num_of_topics_CPU')
+    bertopic = MyBertTopic(bert_topic_path=BASE_PATH.joinpath('model_checkpoints/bert_topic_model_sdgs_no_num_of_topics_CPU'))
 
 print(40 * '=')
 print('DONE LOADING. GO USE IT!')
