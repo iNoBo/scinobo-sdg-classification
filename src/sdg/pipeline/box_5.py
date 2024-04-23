@@ -1,11 +1,11 @@
 
-
+from numba import jit
 from bertopic import BERTopic
 from pprint import pprint
 from collections import Counter
 
 class MyBertTopic:
-    def __init__(self, bert_topic_path = '/home/dpappas/guidedlda_countVectorizer.pickle'):
+    def __init__(self, bert_topic_path = None):
         self.bert_topic_path    = bert_topic_path
         self.topic_model        = BERTopic.load(self.bert_topic_path)
         self.topic_to_sdg       = {
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     We describe estimates from the Centers for Disease Control and Prevention Medical Monitoring Project (MMP) of sociodemographic characteristics, HIV stigma, discrimination, and mental health outcomes among transgender women with diagnosed HIV.
     '''.strip()
     ######################################################################################################
-    k5      = MyBertTopic(bert_topic_path = '/media/dpappas/dpappas_data/BERTopic/bert_topic_model_sdgs_no_num_of_topics')
+    k5      = MyBertTopic(bert_topic_path = None)
     res     = k5.emit_for_abstracts(3*[some_text])
     print(40*'=')
     for abs, sdg_cats in res:
