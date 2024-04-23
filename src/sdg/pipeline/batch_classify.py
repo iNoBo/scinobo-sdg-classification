@@ -2,11 +2,11 @@
 
 import argparse, pickle, torch
 from pprint import pprint
-from pipeline.box_1 import K1_model
-from pipeline.box_2 import KT_matcher
-from pipeline.box_3 import MyGuidedLDA
-from pipeline.box_4 import K4_model
-from pipeline.box_5 import MyBertTopic
+from sdg.pipeline.box_1 import K1_model
+from sdg.pipeline.box_2 import KT_matcher
+from sdg.pipeline.box_3 import MyGuidedLDA
+from sdg.pipeline.box_4 import K4_model
+from sdg.pipeline.box_5 import MyBertTopic
 from tqdm import tqdm
 from collections import Counter
 

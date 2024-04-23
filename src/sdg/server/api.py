@@ -16,11 +16,11 @@ from typing import List, Dict, Any
 from sdg.server.logging_setup import setup_root_logger
 
 from pprint import pprint
-from pipeline.box_1 import K1_model
-from pipeline.box_2 import KT_matcher
-from pipeline.box_3 import MyGuidedLDA
-from pipeline.box_4 import K4_model
-from pipeline.box_5 import MyBertTopic
+from sdg.pipeline.box_1 import K1_model
+from sdg.pipeline.box_2 import KT_matcher
+from sdg.pipeline.box_3 import MyGuidedLDA
+from sdg.pipeline.box_4 import K4_model
+from sdg.pipeline.box_5 import MyBertTopic
 
 # init the logger
 setup_root_logger()
@@ -146,14 +146,14 @@ app.add_middleware(
 
 # create a middleware that logs the requests -- this function logs everything. It might not be needed.
 @app.middleware("http")
-async def log_requests(request, call_next):
+def log_requests(request, call_next):
     LOGGER.info(f"Request: {request.method} {request.url}")
-    response = await call_next(request)
+    response = call_next(request)
     return response
 
 # endpoint for classifying SDG categories
 @app.post("/sdg_classifier", response_model=ClassifierResponse, responses={400: {"model": ErrorResponse}})
-async def sdg_classifier(request: ClassifierRequest):
+def sdg_classifier(request: ClassifierRequest):
     try:
         LOGGER.debug(f"JSON received...")
         LOGGER.debug(request.json)
@@ -224,7 +224,7 @@ async def sdg_classifier(request: ClassifierRequest):
 
 # endpoint for reloading vocabulary
 @app.post("/reload_vocabulary", response_model=ReloadVocabularyResponse, responses={500: {"model": ErrorResponse}})
-async def reload_vocabulary():
+def reload_vocabulary():
     try:
         LOGGER.debug(f"RELOADING SDG KEYPHRASE DICTIONARY...")
         kt_match.reload_vocab()

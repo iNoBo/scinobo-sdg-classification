@@ -5,6 +5,9 @@ RUN mkdir /output_files/
 
 WORKDIR /app
 
+# Install wget
+RUN apt-get update && apt-get install -y wget build-essential
+
 # Copy only the requirements file, to cache the installation of dependencies
 COPY requirements.txt /app/requirements.txt
 
@@ -18,10 +21,17 @@ EXPOSE 8000
 # Set a default port
 ENV PORT=8000
 
+# Get the huggingface token from the build args
+ARG HF_TOKEN
+
+# Make dirs
+RUN mkdir -p /app/src/sdg/model_checkpoints/
+
+# Download model checkpoint
+RUN wget --header="Authorization: Bearer ${HF_TOKEN}" https://huggingface.co/iNoBo/scinobo-sdg-classification-bert-topic/resolve/main/bert_topic_model_sdgs_no_num_of_topics?download=true -O /app/src/sdg/model_checkpoints/bert_topic_model_sdgs_no_num_of_topics
+
 # Copy the rest of your application
 COPY . /app
-
-ENTRYPOINT ["./berttopic_api/bin/python"]
 
 # Change working directory
 WORKDIR /app/src

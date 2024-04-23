@@ -4,7 +4,7 @@ A classifier for scientific literature for the UN Sustainable Development Goals 
 ## Create Docker image
 
 ```
-sudo docker build --tag scinobo_sdg -f ./dockerfile .
+sudo docker build --build-arg HF_TOKEN=<AUTHORIZED ORG HF TOKEN> --tag scinobo_sdg -f ./Dockerfile .
 ```
 
 ## Run image container as a demo
