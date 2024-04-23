@@ -1,22 +1,34 @@
-
-FROM ubuntu:18.04
-
-RUN apt-get update && apt-get install -y software-properties-common && add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get update && apt-get install -y python3.6 python3.6-dev python3-pip
-
-ENV LANG=en_US.UTF-8 \
-  LANGUAGE=en_US:en \
-  LC_ALL=en_US.UTF-8
+FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-runtime
 
 RUN mkdir /input_files/
 RUN mkdir /output_files/
 
 WORKDIR /app
-COPY . /app
+
+# Copy only the requirements file, to cache the installation of dependencies
+COPY requirements.txt /app/requirements.txt
+
+# COPY DESCRIPTIONS
+# install dependencies
 RUN pip install -r requirements.txt
+
+# Expose the port the app runs on
+EXPOSE 8000
+
+# Set a default port
+ENV PORT=8000
+
+# Copy the rest of your application
+COPY . /app
 
 ENTRYPOINT ["./berttopic_api/bin/python"]
 
-CMD ["batch_classify.py", "--delimeter=|~|", "--data_path=resources/data/test_input.txt", "--out_path=resources/data/test_output.txt" ]
+# Change working directory
+WORKDIR /app/src
+
+# Run a shell
+CMD ["bash"]
+
+#CMD ["batch_classify.py", "--delimeter=|~|", "--data_path=resources/data/test_input.txt", "--out_path=resources/data/test_output.txt" ]
 
 
