@@ -16,11 +16,11 @@ from typing import List, Dict, Any
 from sdg.server.logging_setup import setup_root_logger
 
 from pprint import pprint
-from box_1 import K1_model
-from box_2 import KT_matcher
-from box_3 import MyGuidedLDA
-from box_4 import K4_model
-from box_5 import MyBertTopic
+from pipeline.box_1 import K1_model
+from pipeline.box_2 import KT_matcher
+from pipeline.box_3 import MyGuidedLDA
+from pipeline.box_4 import K4_model
+from pipeline.box_5 import MyBertTopic
 
 # init the logger
 setup_root_logger()
