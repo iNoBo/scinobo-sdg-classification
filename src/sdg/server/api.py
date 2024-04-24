@@ -9,11 +9,11 @@ import logging
 import traceback, argparse
 import uvicorn
 from collections import Counter
-import importlib.resources
+import importlib_resources
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Counter
 
 from sdg.server.logging_setup import setup_root_logger
 
@@ -29,7 +29,7 @@ setup_root_logger()
 LOGGER = logging.getLogger(__name__)
 LOGGER.info("SDG API initialized")
 
-BASE_PATH = importlib.resources.files(__package__.split(".")[0])
+BASE_PATH = importlib_resources.files(__package__.split(".")[0])
 
 ################################################################################################################
 
@@ -77,11 +77,11 @@ class ClassifierRequest(BaseModel):
 
 # Pydantic model for the classification result
 class CategoryResult(BaseModel):
-    final_sdg_categories: List[str]
+    final_sdg_categories: Counter[str]
     from_keywords_strict: List[Any]
     from_keywords_lenient: List[Any]
     from_guided_lda: Dict[str, float]
-    from_bertopic: List[Any]
+    from_bertopic: Dict[int, Any]
     cl_distilbert_100_v2: Dict[str, float]
     cl_distilbert_50_v2: Dict[str, float]
     cl_bert_100_v2: Dict[str, float]
@@ -110,9 +110,8 @@ class ErrorResponse(BaseModel):
 # the FastAPI app
 app = FastAPI()
 
-global k1_1, k1_2, k1_3, kt_match, glda, k4, bertopic
-
 def load_models():
+    global k1_1, k1_2, k1_3, kt_match, glda, k4, bertopic
     print(40 * '=')
     print('LOADING bert models')
     k1_1 = K1_model(model_name="distilbert-base-uncased", hidden=100, resume_from=BASE_PATH.joinpath('model_checkpoints/distilbert-base-uncased_100_5e-05_29_84_85.pth.tar'))
@@ -178,7 +177,7 @@ def sdg_classifier(request: ClassifierRequest):
             ###################################################################################################
             final_sdg_categories = []
             ######################################
-            text_to_check = request_data['text']
+            text_to_check = request.text
             ######################################
             kt_sdg_res          = kt_match.emit_for_abstracts([text_to_check])[0][1]
             # kt_sdg_res_counter  = Counter([t[0] for t in kt_sdg_res])

@@ -17,12 +17,12 @@ Example:
 
 import logging
 import os
-import importlib.resources
+import importlib_resources
 
 from logging.handlers import RotatingFileHandler
 
 
-LOGGING_PATH = os.path.join(importlib.resources.files(__package__.split(".")[0]), "logs")
+LOGGING_PATH = os.path.join(importlib_resources.files(__package__.split(".")[0]), "logs")
 LOG_FORMAT = "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
 
 
