@@ -4,7 +4,7 @@ name: Build and Push Docker Image  # Name of the workflow
 on:
   push:
     branches:
-      - huggingface-space  # Trigger on pushes to the 'huggingface-space' branch
+      - hugginface-space  # Trigger on pushes to the 'huggingface-space' branch
 
 # Define jobs
 jobs:
