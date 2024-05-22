@@ -1,0 +1,6 @@
+doi1|~|2. Zero hunger|~|3
+doi1|~|3. Good health|~|5
+doi2|~|5. Gender equality|~|4
+doi2|~|16. Peace & justice|~|3
+doi3|~|3. Good health|~|3
+doi3|~|5. Gender equality|~|3

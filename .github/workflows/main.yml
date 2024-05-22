@@ -1,0 +1,31 @@
+name: Build and Push Docker Image  # Name of the workflow
+
+# Event triggers (push to specific branches)
+on:
+  push:
+    branches:
+      - main  # Trigger on pushes to the 'main' branch
+      - release/**  # Trigger on pushes to any 'release/' branch
+
+# Define jobs
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu environment
+
+    # Steps to be executed within this job
+    steps:
+      # Step to check out the code
+      - uses: actions/checkout@v3
+        name: Check out code
+
+      # Step to build and push a Docker image
+      - uses: mr-smithers-excellent/docker-build-push@v6
+        name: Build and push Docker image
+        with:
+          image: intelligencenoborders/inobo  # Confirm this is your image name
+          tags: sdg-classifier  # This is the Docker tag
+          registry: docker.io  # Ensure this is your Docker registry
+          dockerfile: dockerfile  # Dockerfile to use
+          username: ${{ secrets.DOCKER_USERNAME }}  # Docker username
+          password: ${{ secrets.DOCKER_PASSWORD }}  # Docker password
+          buildArgs: HF_TOKEN=${{ secrets.HUGGINGFACE_TOKEN }}
