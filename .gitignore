@@ -160,5 +160,6 @@ cython_debug/
 #.idea/
 
 src/sdg/model_checkpoints/bert_topic_model_sdgs_no_num_of_topics
+src/sdg/model_checkpoints/bert_topic_model_sdgs_no_num_of_topics_noemb
 .devcontainer/
 .github/dependabot.yml

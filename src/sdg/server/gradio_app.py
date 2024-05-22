@@ -1,4 +1,5 @@
 import os
+import json
 import gradio as gr
 import importlib_resources
 from collections import Counter
@@ -50,7 +51,7 @@ def load_models():
 
     print(40 * '=')
     print('LOADING Bertopic')
-    bertopic = MyBertTopic(bert_topic_path = BASE_PATH.joinpath('model_checkpoints/bert_topic_model_sdgs_no_num_of_topics'))
+    bertopic = MyBertTopic(bert_topic_path = BASE_PATH.joinpath('model_checkpoints/bert_topic_model_sdgs_no_num_of_topics_noemb'))
 
     print(40 * '=')
     print('DONE LOADING. GO USE IT!')
@@ -93,7 +94,7 @@ def analyze_text(snippet, progress=gr.Progress(track_tqdm=True)):
         final_sdg_categories += [k for k, v in bert_results_att.items() if v > BERT_ATT_thres_old]
         ###################################################################################################
         results = {
-            "final_sdg_categories": Counter(final_sdg_categories),
+            "final_sdg_categories": dict(Counter(final_sdg_categories)),
             "from_keywords_strict": [kt for kt in kt_sdg_res if kt[-1]>0],
             "from_keywords_lenient": [kt for kt in kt_sdg_res if kt[-1]<=0],
             "from_guided_lda": guided_sdg_res,
@@ -106,7 +107,7 @@ def analyze_text(snippet, progress=gr.Progress(track_tqdm=True)):
         }
     except Exception as e:
         results = {'error': str(e)}
-    return results
+    return json.dumps(results)
 
 
 # Define the interface for the first tab (Text Analysis)

@@ -82,10 +82,7 @@ glda        = MyGuidedLDA(
 )
 print(40 * '=')
 print('LOADING Bertopic')
-if torch.cuda.is_available():
-    bertopic = MyBertTopic(bert_topic_path = BASE_PATH.joinpath('model_checkpoints/bert_topic_model_sdgs_no_num_of_topics'))
-else:
-    bertopic = MyBertTopic(bert_topic_path=BASE_PATH.joinpath('model_checkpoints/bert_topic_model_sdgs_no_num_of_topics_CPU'))
+bertopic = MyBertTopic(bert_topic_path = BASE_PATH.joinpath('model_checkpoints/bert_topic_model_sdgs_no_num_of_topics_noemb'))
 
 print(40 * '=')
 print('DONE LOADING. GO USE IT!')
