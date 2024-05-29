@@ -1,8 +1,6 @@
 # scinobo-sdg-classification
 A classifier for scientific literature for the UN Sustainable Development Goals (SDG) - developed by SciNoBo-Athena Research Center
 
-`WARNING: Dockerfile cannot be built+pushed to dockerhub using Github Actions, so it was build locally can then pushed.`
-
 ## Create Docker image
 
 ```
