@@ -4,8 +4,7 @@ name: Build and Push Docker Image  # Name of the workflow
 on:
   push:
     branches:
-      - main  # Trigger on pushes to the 'main' branch
-      - release/**  # Trigger on pushes to any 'release/' branch
+      - hugginface-space  # Trigger on pushes to the 'huggingface-space' branch
 
 # Define jobs
 jobs:
@@ -22,10 +21,9 @@ jobs:
       - uses: mr-smithers-excellent/docker-build-push@v6
         name: Build and push Docker image
         with:
-          image: intelligencenoborders/inobo  # Confirm this is your image name
-          tags: sdg-classifier  # This is the Docker tag
+          image: intelligencenoborders/scinobo-sdg-classifier  # Confirm this is your image name
+          tags: v0.1.0,latest  # This is the Docker tag
           registry: docker.io  # Ensure this is your Docker registry
           dockerfile: dockerfile  # Dockerfile to use
           username: ${{ secrets.DOCKER_USERNAME }}  # Docker username
           password: ${{ secrets.DOCKER_PASSWORD }}  # Docker password
-          buildArgs: HF_TOKEN=${{ secrets.HUGGINGFACE_TOKEN }}

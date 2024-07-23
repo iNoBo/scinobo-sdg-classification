@@ -140,7 +140,7 @@ def load_models():
 
     print(40 * '=')
     print('LOADING Bertopic')
-    bertopic = MyBertTopic(bert_topic_path = BASE_PATH.joinpath('model_checkpoints/bert_topic_model_sdgs_no_num_of_topics'))
+    bertopic = MyBertTopic(bert_topic_path = BASE_PATH.joinpath('model_checkpoints/bert_topic_model_sdgs_no_num_of_topics_noemb'))
 
     print(40 * '=')
     print('DONE LOADING. GO USE IT!')

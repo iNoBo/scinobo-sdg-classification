@@ -7,7 +7,7 @@ from collections import Counter
 class MyBertTopic:
     def __init__(self, bert_topic_path = None):
         self.bert_topic_path    = bert_topic_path
-        self.topic_model        = BERTopic.load(self.bert_topic_path)
+        self.topic_model        = BERTopic.load(self.bert_topic_path, embedding_model='sentence-transformers/all-MiniLM-L6-v2')
         self.topic_to_sdg       = {
             0 : [0], 1 : [16], 2 : [6], 3 : [4], 4 : [0], 5 : [2, 15], 6 : [2], 7 : [0], 8 : [1], 9 : [15], 10 : [3],
             11 : [3, 10], 12 : [7, 11], 13 : [3], 14 : [5], 15 : [11], 16 : [14], 17 : [0], 18 : [3], 19 : [1, 8],
