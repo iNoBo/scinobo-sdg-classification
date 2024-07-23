@@ -1,6 +1,7 @@
 import os
 import json
 import gradio as gr
+import requests as req
 import importlib_resources
 from collections import Counter
 
@@ -10,6 +11,10 @@ from sdg.pipeline.box_3 import MyGuidedLDA
 from sdg.pipeline.box_4 import K4_model
 from sdg.pipeline.box_5 import MyBertTopic
 
+# Retrieve HF space secrets
+BACKEND_IP = os.getenv('BACKEND_IP')
+BACKEND_PORT = os.getenv('BACKEND_PORT')
+BACKEND_PATH = os.getenv('BACKEND_PATH')
 
 guided_thres = float(os.getenv("GUIDED_THRES", "0.4"))
 BERT_thres = float(os.getenv("BERT_THRES", "0.7"))
@@ -109,19 +114,45 @@ def analyze_text(snippet, progress=gr.Progress(track_tqdm=True)):
         results = {'error': str(e)}
     return json.dumps(results)
 
+def analyze_input_doi(
+    doi: str | None
+):
+    if (doi is None):
+        results = {'error': 'Please provide the DOI of the publication'}
+        return results
+    if (doi == ''):
+        results = {'error': 'Please provide the DOI of the publication'}
+        return results
+    try:
+        url = f"http://{BACKEND_IP}:{BACKEND_PORT}{BACKEND_PATH}{doi}"
+        response = req.get(url)
+        response.raise_for_status()
+        results = response.json()
+        return results
+    except Exception as e:
+        results = {'error': str(e)}
+    return results
 
 # Define the interface for the first tab (Text Analysis)
 with gr.Blocks() as text_analysis:
-    gr.Markdown("### Sustainable Development Goal (SDG) Classifier")
+    gr.Markdown("### Sustainable Development Goal (SDG) Classifier - Text Mode")
     text_input = gr.Textbox(label="Snippet")
     process_text_button = gr.Button("Process")
     text_output = gr.JSON(label="Output")
 
     process_text_button.click(analyze_text, inputs=[text_input], outputs=[text_output])
 
+# Define the interface for the second tab (DOI Mode)
+with gr.Blocks() as doi_mode:
+    gr.Markdown("### Sustainable Development Goal (SDG) Classifier - DOI Mode")
+    doi_input = gr.Textbox(label="DOI", placeholder="Enter a valid Digital Object Identifier")
+    process_doi_button = gr.Button("Process")
+    doi_output = gr.JSON(label="Output")
+    process_doi_button.click(analyze_input_doi, inputs=[doi_input], outputs=[doi_output])
+
 # Combine the tabs into one interface
 with gr.Blocks() as demo:
-    gr.TabbedInterface([text_analysis], ["Text Mode"])
+    gr.TabbedInterface([text_analysis, doi_mode], ["Text Mode","DOI Mode"])
 
 # Launch the interface
 demo.queue().launch()
