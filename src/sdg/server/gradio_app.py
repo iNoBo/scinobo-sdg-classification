@@ -4,6 +4,7 @@ import gradio as gr
 import requests as req
 import importlib_resources
 from collections import Counter
+from typing import Optional
 
 from sdg.pipeline.box_1 import K1_model
 from sdg.pipeline.box_2 import KT_matcher
@@ -114,9 +115,7 @@ def analyze_text(snippet, progress=gr.Progress(track_tqdm=True)):
         results = {'error': str(e)}
     return json.dumps(results)
 
-def analyze_input_doi(
-    doi: str | None
-):
+def analyze_input_doi(doi: Optional[str]):
     if (doi is None):
         results = {'error': 'Please provide the DOI of the publication'}
         return results
