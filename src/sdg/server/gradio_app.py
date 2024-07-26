@@ -12,7 +12,7 @@ from sdg.pipeline.box_3 import MyGuidedLDA
 from sdg.pipeline.box_4 import K4_model
 from sdg.pipeline.box_5 import MyBertTopic
 
-# Retrieve HF space secrets
+# retrieve HF space secrets
 BACKEND_IP = os.getenv('BACKEND_IP')
 BACKEND_PORT = os.getenv('BACKEND_PORT')
 BACKEND_PATH = os.getenv('BACKEND_PATH')
@@ -64,7 +64,7 @@ def load_models():
 
 load_models()
 
-# Define the functions to handle the inputs and outputs
+# define the functions to handle the inputs and outputs
 def analyze_text(snippet, progress=gr.Progress(track_tqdm=True)):
     results = {}
     try:
@@ -116,23 +116,31 @@ def analyze_text(snippet, progress=gr.Progress(track_tqdm=True)):
     return json.dumps(results)
 
 def analyze_input_doi(doi: Optional[str]):
-    if (doi is None):
-        results = {'error': 'Please provide the DOI of the publication'}
-        return results
-    if (doi == ''):
+    if doi is None or doi == '':
         results = {'error': 'Please provide the DOI of the publication'}
         return results
     try:
         url = f"http://{BACKEND_IP}:{BACKEND_PORT}{BACKEND_PATH}{doi}"
         response = req.get(url)
         response.raise_for_status()
-        results = response.json()
+        doi_results = response.json()
+        # parse response to call analyze_text
+        title = doi_results.get("title", "")
+        abstract = doi_results.get("abstract", "")
+        text = title + ". " + abstract 
+        metadata_results = analyze_text(text)
+        # combine the two outputs
+        combined_results = {
+            "inferred_metadata": doi_results,
+            "results": metadata_results
+        }
+        results = json.dumps(combined_results)
         return results
     except Exception as e:
         results = {'error': str(e)}
     return results
 
-# Define the interface for the first tab (Text Analysis)
+# define the interface for the first tab (Text Analysis)
 with gr.Blocks() as text_analysis:
     gr.Markdown("### Sustainable Development Goal (SDG) Classifier - Text Mode")
     text_input = gr.Textbox(label="Snippet")
@@ -141,7 +149,7 @@ with gr.Blocks() as text_analysis:
 
     process_text_button.click(analyze_text, inputs=[text_input], outputs=[text_output])
 
-# Define the interface for the second tab (DOI Mode)
+# define the interface for the second tab (DOI Mode)
 with gr.Blocks() as doi_mode:
     gr.Markdown("### Sustainable Development Goal (SDG) Classifier - DOI Mode")
     doi_input = gr.Textbox(label="DOI", placeholder="Enter a valid Digital Object Identifier")
@@ -149,9 +157,9 @@ with gr.Blocks() as doi_mode:
     doi_output = gr.JSON(label="Output")
     process_doi_button.click(analyze_input_doi, inputs=[doi_input], outputs=[doi_output])
 
-# Combine the tabs into one interface
+# combine the tabs into one interface
 with gr.Blocks() as demo:
     gr.TabbedInterface([text_analysis, doi_mode], ["Text Mode","DOI Mode"])
 
-# Launch the interface
+# launch the interface
 demo.queue().launch()
