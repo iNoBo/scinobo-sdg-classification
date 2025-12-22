@@ -140,6 +140,8 @@ def do_for_one_batch(batch_dois, batch_texts, all_file_results):
 
 if __name__ == '__main__':
     for filename in os.listdir(data_dir):
+        if not filename.endswith('.parquet'):
+            continue
         data_path   = os.path.join(data_dir, filename)
         out_path    = os.path.join(out_dir, filename)
         ################################################################################
