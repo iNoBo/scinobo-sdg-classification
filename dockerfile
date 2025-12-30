@@ -34,9 +34,6 @@ RUN mkdir -p /app/src/sdg/model_checkpoints/
 
 RUN apt-get install -y wget
 
-# Get the huggingface token from the build args
-ARG HF_TOKEN
-
 # Download model checkpoint
 RUN wget https://huggingface.co/iNoBo/scinobo-sdg-classification-bert-topic/resolve/main/bert_topic_model_sdgs_no_num_of_topics_noemb?download=true -O /app/src/sdg/model_checkpoints/bert_topic_model_sdgs_no_num_of_topics_noemb
 
